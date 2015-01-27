@@ -85,11 +85,9 @@ public class SVGConverter {
 
 			// parameters to JSON
 			String json = gson.toJson(params);
-
 			// send to phantomJs
 			String output = "";
 			output = requestServer(json);
-
 			// check first for errors
 			if (output.length() > 5 && output.substring(0,5).equalsIgnoreCase("error")) {
 				throw new SVGConverterException("recveived error from phantomjs:" + output);

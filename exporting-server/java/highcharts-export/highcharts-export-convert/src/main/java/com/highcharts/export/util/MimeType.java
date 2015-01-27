@@ -19,7 +19,7 @@ public enum MimeType {
 	PDF("application/pdf", "pdf"),
 	SVG("image/svg+xml", "svg");
 
-	private static final Map<String, MimeType> lookup = new HashMap<>();
+	private static final Map<String, MimeType> lookup = new HashMap<String, MimeType>();
 
 	static {
 		for (MimeType m : EnumSet.allOf(MimeType.class)) {

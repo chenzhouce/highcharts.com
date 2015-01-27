@@ -36,15 +36,15 @@ public class XSSFilter implements Filter {
 		}
 
 		public Map<String, String[]> getParameterMap() {
-			Map<String, String[]> filtered = new HashMap<>();
-			for( Map.Entry<String, String[]> params : super.getParameterMap().entrySet() ) {
+			Map<String, String[]> filtered = new HashMap<String, String[]>();
+			for (Object o : super.getParameterMap().entrySet()) {
+				Map.Entry<String, String[]> params = (Map.Entry<String, String[]>) o;
 				String key = params.getKey();
 				String[] values = params.getValue();
 
-				List<String> cleaned = new ArrayList<>();
-				for( String value : values )
-				{
-					cleaned.add( stripXSS(value));
+				List<String> cleaned = new ArrayList<String>();
+				for (String value : values) {
+					cleaned.add(stripXSS(value));
 				}
 				String[] arr = new String[cleaned.size()];
 
@@ -56,7 +56,7 @@ public class XSSFilter implements Filter {
 
 		@Override
 		public String[] getParameterValues(String name) {
-			List<String> filtered = new ArrayList<>();
+			List<String> filtered = new ArrayList<String>();
 
 			String[] values = super.getParameterValues(name);
 			if (null == values) {

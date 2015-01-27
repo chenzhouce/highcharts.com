@@ -127,7 +127,7 @@
             $.ajax({
                 type: 'POST',
                 data: dataString,
-                url: './',
+                url: './export',
                 success: function (data) {
                 	preview(data);
                 },
@@ -148,7 +148,7 @@
 	</div>
 
 	<div id="wrap">
-		<form id="exportForm" action="./" method="POST">
+		<form id="exportForm" action="./export" method="POST">
 
 			<h1>Highcharts Export Server</h1>
 		

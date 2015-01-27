@@ -2,11 +2,11 @@ package com.highcharts.export.pool;
 
 import com.highcharts.export.util.TempDir;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
+//import java.io.IOException;
+//import java.nio.file.Files;
+//import java.nio.file.Path;
+//import java.nio.file.Paths;
+//import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Queue;
@@ -91,20 +91,17 @@ public abstract class AbstractPool<T> implements ObjectPool<T> {
 
 			@Override
 			public boolean accept(File file) {
-				try {
-					Long now = new Date().getTime();
-					Path path = Paths.get(file.getAbsolutePath());
-					BasicFileAttributes attrs = Files.readAttributes(path, BasicFileAttributes.class);
-					Long inBetween = now - attrs.lastAccessTime().toMillis();
+                Long now = new Date().getTime();
 
-					if (inBetween > retentionTime) {
-						return true;
-					}
+//					Path path = Paths.get(file.getAbsolutePath());
+//					BasicFileAttributes attrs = Files.readAttributes(path, BasicFileAttributes.class);
+                Long inBetween = now - file.lastModified();
 
-				} catch (IOException ioex) {
-					logger.error("Error: while selection files for deletion: "  + ioex.getMessage());
-				}
-				return false;
+                if (inBetween > retentionTime) {
+                    return true;
+                }
+
+                return false;
 			}
 
 			@Override
@@ -113,7 +110,7 @@ public abstract class AbstractPool<T> implements ObjectPool<T> {
 			}
 		};
 
-		Collection<File> oldFiles = FileUtils.listFiles(TempDir.outputDir.toFile(),filter, null);
+		Collection<File> oldFiles = FileUtils.listFiles(TempDir.outputDir,filter, null);
 		for (File file : oldFiles) {
 			file.delete();
 		}

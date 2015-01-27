@@ -1,10 +1,6 @@
 package com.highcharts.export.server;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -30,7 +26,7 @@ public class Server {
 
 	protected static final Logger logger = Logger.getLogger("server");
 
-	public Server(String exec, String script, String host, int port, int connectTimeout, int readTimeout, int maxTimeout) {
+	public Server(String exec, String script, String host, int port, int connectTimeout, int readTimeout, int maxTimeout){
 
 		// assign port and host to this instance
 		this.port = port;
@@ -38,7 +34,6 @@ public class Server {
 		this.connectTimeout = connectTimeout;
 		this.readTimeout = readTimeout;
 		this.maxTimeout = maxTimeout;
-
 		try {
 			ArrayList<String> commands = new ArrayList<String>();
 			commands.add(exec);
@@ -54,6 +49,7 @@ public class Server {
 			final BufferedReader bufferedReader = new BufferedReader(
 					new InputStreamReader(process.getInputStream()));
 			String readLine = bufferedReader.readLine();
+			logger.log(Level.WARNING, readLine);
 			if (readLine == null || !readLine.contains("ready")) {
                 logger.log(Level.WARNING, "Command starting Phantomjs failed");
                 process.destroy();
@@ -91,9 +87,10 @@ public class Server {
 		String response = "";
 		Timer _timer = new Timer();
 		try {
-			URL url = new URL("http://" + host + ":"
-					+ port + "/");
-			
+//			URL url = new URL("http://" + host + ":"
+//					+ port + "/");
+			sun.net.www.protocol.http.Handler handler = new sun.net.www.protocol.http.Handler();
+			URL url = new URL(null, "http://" + host + ":" + port + "/", handler);
 			// TEST with running a local phantom instance
 			// url = new URL("http://" + host + ":7777/");
 			// logger.log(Level.INFO, "requesting url: " + url.toString());

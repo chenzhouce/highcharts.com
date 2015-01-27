@@ -34,8 +34,8 @@ import com.highcharts.export.pool.PoolException;
 import com.highcharts.export.util.MimeType;
 import com.highcharts.export.util.TempDir;
 import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+//import java.nio.file.Path;
+//import java.nio.file.Paths;
 import javax.servlet.http.HttpSession;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
@@ -62,7 +62,7 @@ public class ExportController extends HttpServlet {
 		return "demo";
 	}
 
-	@RequestMapping(method = {RequestMethod.POST, RequestMethod.GET})
+	@RequestMapping(value = "/export", method = {RequestMethod.POST, RequestMethod.GET})
 	public HttpEntity<byte[]> exporter(
 		@RequestParam(value = "svg", required = false) String svg,
 		@RequestParam(value = "type", required = false) String type,
@@ -78,7 +78,6 @@ public class ExportController extends HttpServlet {
 		@RequestParam(value = "jsonp", required = false, defaultValue = "false") Boolean jsonp,
 		HttpServletRequest request,
 		HttpSession session) throws ServletException, InterruptedException, SVGConverterException, NoSuchElementException, PoolException, TimeoutException, IOException, ZeroRequestParameterException {
-
 		MimeType mime = getMime(type);
 		String randomFilename = null;
 		String jsonpCallback = "";
@@ -130,7 +129,6 @@ public class ExportController extends HttpServlet {
             logger.debug("storing randomfile in session: " +  FilenameUtils.getName(randomFilename));
             session.setAttribute("tempFile", FilenameUtils.getName(randomFilename));
         }
-
 		String output = convert(svg, mime, width, scale, options, constructor, callback, globalOptions, randomFilename);
 		ByteArrayOutputStream stream;
 
@@ -171,8 +169,11 @@ public class ExportController extends HttpServlet {
 	@RequestMapping(value = "/files/{name}.{ext}", method = RequestMethod.GET)
 	public HttpEntity<byte[]> getFile(@PathVariable("name") String name, @PathVariable("ext") String extension) throws SVGConverterException, IOException {
 		
-		Path path = Paths.get(TempDir.getOutputDir().toString(), name + "." + extension);
-		String filename = path.toString();
+//		Path path = Paths.get(TempDir.getOutputDir().toString(), name + "." + extension);
+
+        File file = FileUtils.getFile(TempDir.getOutputDir(), name + "." + extension);
+
+		String filename = file.getAbsolutePath();
 		MimeType mime = getMime(extension);
 
 		ByteArrayOutputStream stream = writeFileToStream(filename);
@@ -322,8 +323,9 @@ public class ExportController extends HttpServlet {
 	}
 
 	public String createRandomFileName(String extension) {
-		Path path = Paths.get(TempDir.outputDir.toString(), RandomStringUtils.randomAlphanumeric(8) + "." + extension);
-		return path.toString();
+//		Path path = Paths.get(TempDir.outputDir.toString(), RandomStringUtils.randomAlphanumeric(8) + "." + extension);
+        File file = FileUtils.getFile(TempDir.outputDir, RandomStringUtils.randomAlphanumeric(8) + "." + extension);
+		return file.getAbsolutePath();
 	}
 
 	private ByteArrayOutputStream outputToStream(String output, boolean base64) throws SVGConverterException {
@@ -345,7 +347,6 @@ public class ExportController extends HttpServlet {
 
 	private ByteArrayOutputStream writeFileToStream(String filename) throws SVGConverterException {
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-
 		try {
 			stream.write(FileUtils.readFileToByteArray(new File(filename)));
 		} catch (IOException ioex) {

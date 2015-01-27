@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import com.highcharts.export.server.Server;
@@ -16,9 +17,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+//import java.nio.file.Files;
+//import java.nio.file.Path;
+//import java.nio.file.Paths;
 import java.util.TreeMap;
 
 import org.apache.commons.io.IOUtils;
@@ -34,7 +35,7 @@ public class ServerObjectFactory implements ObjectFactory<Server> {
 	private int poolSize;
 	private int connectTimeout;
 	private int maxTimeout;
-	private static TreeMap<Integer, PortStatus> portUsage = new TreeMap<>();
+	private static TreeMap<Integer, PortStatus> portUsage = new TreeMap<Integer, PortStatus>();
 	protected static Logger logger = Logger.getLogger("pool");
 
 	private enum PortStatus {
@@ -48,7 +49,7 @@ public class ServerObjectFactory implements ObjectFactory<Server> {
 		Integer port = this.getAvailablePort();
         if (script.isEmpty()) {
             // use the bundled highcharts-convert.js script
-            script = TempDir.getPhantomJsDir().toAbsolutePath().toString() + "/highcharts-convert.js";
+            script = TempDir.getPhantomJsDir().getAbsolutePath() + "/highcharts-convert.js";
         }
         Server server = new Server(exec, script, host, port, connectTimeout, readTimeout, maxTimeout);
 		portUsage.put(port, PortStatus.BUSY);
@@ -188,7 +189,7 @@ public class ServerObjectFactory implements ObjectFactory<Server> {
 	}
 
 	@PostConstruct
-	public void afterBeanInit() {
+	public void afterBeanInit() throws IOException {
 		
 		URL u = getClass().getProtectionDomain().getCodeSource().getLocation();
 		URLClassLoader jarLoader = new URLClassLoader(new URL[]{u}, Thread.currentThread().getContextClassLoader());
@@ -198,10 +199,12 @@ public class ServerObjectFactory implements ObjectFactory<Server> {
 		
 			ClassPathResource resource = new ClassPathResource("phantomjs/" + filename, jarLoader);
 			if (resource.exists()) {
-				Path path = Paths.get(TempDir.getPhantomJsDir().toString(), filename);
-				File file;
+//				Path path = Paths.get(TempDir.getPhantomJsDir().toString(), filename);
+                File file = FileUtils.getFile(TempDir.getPhantomJsDir(), filename);
+                FileUtils.touch(file);
+//				File file;
 				try {
-					file = Files.createFile(path).toFile();
+//					file = Files.createFile(path).toFile();
 					file.deleteOnExit();
 					InputStream in = resource.getInputStream();
 					IOUtils.copy(in, new FileOutputStream(file));
